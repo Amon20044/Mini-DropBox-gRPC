@@ -183,16 +183,17 @@ list_files() {
     cat > /tmp/list_files.py <<'PYEOF'
 import sys
 sys.path.insert(0, '.')
-import socket
-from common.utils import send_msg, recv_msg
+import grpc
+from proto import dropbox_pb2
+from proto import dropbox_pb2_grpc
 
-s = socket.socket()
-s.connect(("127.0.0.1", 9000))
-send_msg(s, {"type": "list_files"})
-resp = recv_msg(s)
-s.close()
+channel = grpc.insecure_channel("127.0.0.1:9000")
+stub = dropbox_pb2_grpc.MasterServiceStub(channel)
+request = dropbox_pb2.ListFilesRequest()
+response = stub.ListFiles(request)
+channel.close()
 
-files = resp.get("files", [])
+files = response.files
 if files:
     for i, f in enumerate(files, 1):
         print(f"{i}. {f}")
@@ -286,32 +287,33 @@ analyze_system() {
         cat > /tmp/manifest_analysis.py <<'PYEOF'
 import sys
 sys.path.insert(0, '.')
-import socket
-from common.utils import send_msg, recv_msg
+import grpc
+from proto import dropbox_pb2
+from proto import dropbox_pb2_grpc
 
 try:
-    s = socket.socket()
-    s.connect(("127.0.0.1", 9000))
-    send_msg(s, {"type": "list_files"})
-    resp = recv_msg(s)
-    s.close()
+    channel = grpc.insecure_channel("127.0.0.1:9000")
+    stub = dropbox_pb2_grpc.MasterServiceStub(channel)
     
-    files = resp.get("files", [])
+    # List files
+    list_request = dropbox_pb2.ListFilesRequest()
+    list_response = stub.ListFiles(list_request)
+    files = list_response.files
+    
     if files:
         print(f"  Total Files: {len(files)}")
         print(f"\n  Files:")
         for f in files:
             # Get manifest for each file
-            s2 = socket.socket()
-            s2.connect(("127.0.0.1", 9000))
-            send_msg(s2, {"type": "get_manifest", "filename": f})
-            manifest = recv_msg(s2)
-            s2.close()
-            chunks = manifest.get("chunks", [])
+            manifest_request = dropbox_pb2.GetManifestRequest(filename=f)
+            manifest_response = stub.GetManifest(manifest_request)
+            chunks = manifest_response.chunks
             print(f"    • {f}")
             print(f"      └─ Chunks: {len(chunks)}")
     else:
         print("  No files stored in system")
+    
+    channel.close()
 except Exception as e:
     print(f"  Error querying master: {e}")
 PYEOF
@@ -464,44 +466,42 @@ monitor_live() {
 #==============================================================================
 
 show_usage() {
-    cat << EOF
-${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}
-${CYAN}  Mini-Dropbox CLI - Distributed File Storage System${NC}
-${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}
-
-${YELLOW}SYSTEM MANAGEMENT:${NC}
-  ./run.sh start              Start all services (master + 2 storage nodes)
-  ./run.sh stop               Stop all services
-  ./run.sh restart            Restart all services
-  ./run.sh status             Check system status
-
-${YELLOW}FILE OPERATIONS:${NC}
-  ./run.sh upload <file>      Upload file to Mini-Dropbox
-  ./run.sh download <name> <out>  Download file from Mini-Dropbox
-  ./run.sh list               List all stored files
-
-${YELLOW}ANALYSIS & MONITORING:${NC}
-  ./run.sh analyze            Full system analysis (storage, chunks, SHA-256)
-  ./run.sh verify             Verify chunk integrity across nodes
-  ./run.sh monitor            Live system monitoring (real-time)
-
-${YELLOW}EXAMPLES:${NC}
-  ./run.sh start
-  ./run.sh upload hello.txt
-  ./run.sh list
-  ./run.sh analyze
-  ./run.sh download hello.txt hello_downloaded.txt
-  ./run.sh verify
-  ./run.sh monitor
-
-${YELLOW}TECHNICAL DETAILS:${NC}
-  • Chunk Size: 64 KB
-  • Hash Algorithm: SHA-256 (content-addressable storage)
-  • Replication Factor: 2 nodes per chunk
-  • Network Protocol: gRPC (Protocol Buffers)
-
-${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}
-EOF
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  Mini-Dropbox CLI - Distributed File Storage System${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${YELLOW}SYSTEM MANAGEMENT:${NC}"
+    echo "  ./run.sh start              Start all services (master + 2 storage nodes)"
+    echo "  ./run.sh stop               Stop all services"
+    echo "  ./run.sh restart            Restart all services"
+    echo "  ./run.sh status             Check system status"
+    echo ""
+    echo -e "${YELLOW}FILE OPERATIONS:${NC}"
+    echo "  ./run.sh upload <file>      Upload file to Mini-Dropbox"
+    echo "  ./run.sh download <name> <out>  Download file from Mini-Dropbox"
+    echo "  ./run.sh list               List all stored files"
+    echo ""
+    echo -e "${YELLOW}ANALYSIS & MONITORING:${NC}"
+    echo "  ./run.sh analyze            Full system analysis (storage, chunks, SHA-256)"
+    echo "  ./run.sh verify             Verify chunk integrity across nodes"
+    echo "  ./run.sh monitor            Live system monitoring (real-time)"
+    echo ""
+    echo -e "${YELLOW}EXAMPLES:${NC}"
+    echo "  ./run.sh start"
+    echo "  ./run.sh upload hello.txt"
+    echo "  ./run.sh list"
+    echo "  ./run.sh analyze"
+    echo "  ./run.sh download hello.txt hello_downloaded.txt"
+    echo "  ./run.sh verify"
+    echo "  ./run.sh monitor"
+    echo ""
+    echo -e "${YELLOW}TECHNICAL DETAILS:${NC}"
+    echo "  • Chunk Size: 64 KB"
+    echo "  • Hash Algorithm: SHA-256 (content-addressable storage)"
+    echo "  • Replication Factor: 2 nodes per chunk"
+    echo "  • Network Protocol: gRPC (Protocol Buffers)"
+    echo ""
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }
 
 #==============================================================================

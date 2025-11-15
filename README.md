@@ -4,6 +4,29 @@ A scalable distributed file storage system implementing master-worker architectu
 
 ---
 
+## 🚀 Why gRPC Over REST?
+
+We chose gRPC for this distributed system because it provides significant performance advantages over traditional REST APIs:
+
+| Feature | REST | gRPC |
+|---------|------|------|
+| **Transport** | HTTP 1.1 | HTTP/2 |
+| **Serialization** | JSON (heavy) | Protobuf |
+| **Streaming** | Awkward | Native bidirectional |
+| **Latency** | 2–10× slower | very much low |
+| **Contract** | Loose | Strongly typed protobuf (Binary Sequences lowest level) |
+| **Mobile performance** | Medium | Insane efficient |
+
+### Key Advantages for Mini-Dropbox:
+
+- **Binary Protocol Buffers**: 3-10× smaller payload than JSON, faster serialization
+- **HTTP/2 Multiplexing**: Multiple concurrent chunk transfers over single connection
+- **Strong Typing**: Auto-generated code from `.proto` files eliminates API mismatch errors
+- **Low Latency**: Critical for distributed storage where every millisecond counts
+- **Efficient Streaming**: Perfect for large file chunk transfers
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -801,10 +824,11 @@ pip install -r requirements.txt
 Title: Mini-Dropbox: Distributed File Storage System
 Subtitle: Implementing Master-Worker Architecture with gRPC
 
-[Your Names]
-[Your Roll Numbers]
+Amon Sharma - 202251015
+Kaustubh Duse - 202251045
+Rudra Patel - 202251094
 
-Course: [Course Name]
+Course: CS401 (25) - Introduction to Distributed and Parallel Computing
 Date: November 15, 2025
 ```
 
@@ -859,11 +883,28 @@ def chunk_file(path):
 - Parallel chunk transfers
 - Automatic failover on node failure
 
-**Demo Output:** (Include screenshot of `./run.sh analyze`)
+**Demo Output:**
+
+##### Server Start
+![Server Start](image-4.png)
+
+##### Server Analysis - System Status & Storage
+![System Status](image-3.png)
+![Chunk Analysis](image-2.png)
+![Network Configuration](image-1.png)
+
+##### File Upload & Listing (supports any file extension)
+![Upload and List](image-5.png)
+
+##### File Download with Custom Output Path
+![Download Command](image-6.png)
+
+##### Downloaded Image Verification
+![Downloaded Image Output](image-7.png)
 
 ### Slide 5: Conclusion
 
-**Achievements:**
+**Achievements:** \
 ✓ Functional distributed storage system  
 ✓ Master-worker architecture implementation  
 ✓ gRPC-based high-performance communication  
@@ -877,32 +918,43 @@ def chunk_file(path):
 - System scalability principles
 
 **Real-world Applications:**
+- DropBox
 - Google File System (GFS)
 - Hadoop HDFS
 - Amazon S3 architecture
 
 ---
 
-## 👥 Contributors
+## 👥 Project Team
 
-[Your Name] - [Roll Number]  
-[Team Member 2] - [Roll Number]  
-[Team Member 3] - [Roll Number]  
+**Course:** CS401 (25) - Introduction to Distributed and Parallel Computing  
+**Institution:** Indian Institute of Information Technology Vadodara, ICD  
+**Instructor:** [Dr. Sanjay Saxena](https://www.linkedin.com/in/dr-sanjay-saxena-291a746b)
+
+### Team Members
+
+| Name | Roll Number | Contact | LinkedIn |
+|------|-------------|---------|----------|
+| **Amon Sharma** | 202251015 | [202251015@iiitvadodara.ac.in](mailto:202251015@iiitvadodara.ac.in) | [LinkedIn](https://www.linkedin.com/in/amonsharma007/) |
+| **Kaustubh Duse** | 202251045 | [202251045@iiitvadodara.ac.in](mailto:202251045@iiitvadodara.ac.in) | [LinkedIn](https://www.linkedin.com/in/kaustubhduse/) |
+| **Rudra Patel** | 202251094 | [202251094@iiitvadodara.ac.in](mailto:202251094@iiitvadodara.ac.in) | [LinkedIn](https://www.linkedin.com/in/rudra-patel-32859425b/) | 
 
 ---
 
 ## 📄 License
 
-This project is created for educational purposes as part of [Course Name].
+This project is created for educational purposes as part of **CS401 (25) - Introduction to Distributed and Parallel Computing** under the guidance of [Dr. Sanjay Saxena](https://www.linkedin.com/in/dr-sanjay-saxena-291a746b).
 
 ---
 
 ## 🙏 Acknowledgments
 
-- Inspired by Google File System (GFS) and Hadoop HDFS
-- Built with Python and gRPC
+- Inspired by DropBox, Google File System (GFS) and Hadoop HDFS
+- Built with Python leveraging gRPC
 - Protocol Buffers for efficient serialization
 
 ---
 
-**Made with ❤️ for Distributed Systems Course**
+**Made with ❤️ for CS401 (25) - Introduction to Distributed and Parallel Computing**
+
+**IIIT Vadodara, ICD** | November 2025
