@@ -887,6 +887,6 @@ This project is created for educational purposes as part of **CS401 (25) - Intro
 
 ---
 
-**Made with ❤️ for CS401 (25) - Introduction to Distributed and Parallel Computing**
+**CS401 (25) - Introduction to Distributed and Parallel Computing**
 
 **IIIT Vadodara** | November 2025
