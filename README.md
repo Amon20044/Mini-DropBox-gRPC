@@ -889,4 +889,4 @@ This project is created for educational purposes as part of **CS401 (25) - Intro
 
 **Made with ❤️ for CS401 (25) - Introduction to Distributed and Parallel Computing**
 
-**IIIT Vadodara, ICD** | November 2025
+**IIIT Vadodara** | November 2025
