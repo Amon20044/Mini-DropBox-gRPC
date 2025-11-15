@@ -817,73 +817,7 @@ pip install -r requirements.txt
 
 ---
 
-## 🎓 PPT Slide Content Guide
-
-### Slide 1: Title Slide
-```
-Title: Mini-Dropbox: Distributed File Storage System
-Subtitle: Implementing Master-Worker Architecture with gRPC
-
-Amon Sharma - 202251015
-Kaustubh Duse - 202251045
-Rudra Patel - 202251094
-
-Course: CS401 (25) - Introduction to Distributed and Parallel Computing
-Date: November 15, 2025
-```
-
-### Slide 2: Problem Description
-**Key Points:**
-- Traditional centralized storage has single point of failure
-- Large files difficult to handle efficiently
-- No built-in redundancy or fault tolerance
-- Scalability limitations
-
-**Solution:**
-- Distributed architecture with master-worker pattern
-- File chunking (64KB pieces) for parallel processing
-- 2-way replication for fault tolerance
-- gRPC for high-performance communication
-
-### Slide 3: Methods & Code Highlights
-
-**Architecture Diagram:** (Use Mermaid diagram from above)
-
-**Key Technologies:**
-- gRPC / Protocol Buffers
-- SHA-256 content addressing
-- Python 3.8+
-- HTTP/2 transport
-
-**Code Snippet:**
-```python
-# Chunking with SHA-256
-def chunk_file(path):
-    chunks = []
-    with open(path, "rb") as f:
-        idx = 0
-        while data := f.read(64*1024):  # 64KB chunks
-            chunk_id = hashlib.sha256(data + str(idx).encode()).hexdigest()
-            chunks.append((chunk_id, data))
-            idx += 1
-    return chunks
-```
-
-### Slide 4: Results
-
-**System Metrics:**
-- Chunk Size: 64 KB
-- Replication Factor: 2×
-- Fault Tolerance: Survives 1 node failure
-- Protocol: gRPC (faster than JSON/REST)
-
-**Performance:**
-- 1MB file → 16 chunks
-- Upload time: ~200ms
-- Parallel chunk transfers
-- Automatic failover on node failure
-
-**Demo Output:**
+## OUTPUT
 
 ##### Server Start
 ![Server Start](image-4.png)
@@ -901,8 +835,6 @@ def chunk_file(path):
 
 ##### Downloaded Image Verification
 ![Downloaded Image Output](image-7.png)
-
-### Slide 5: Conclusion
 
 **Achievements:** \
 ✓ Functional distributed storage system  
